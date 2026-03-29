@@ -1,0 +1,646 @@
+--VeiL Founded by Adhrit--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEIL — Off doesn't mean gone.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#080808;
+  --white:#F0EDE8;
+  --acid:#C8FF00;
+  --dim:#666660;
+  --border:rgba(240,237,232,0.08);
+  --border-hover:rgba(200,255,0,0.25);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:none;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9998;opacity:.5;
+}
+
+/* CURSOR */
+#cursor{position:fixed;top:0;left:0;z-index:9999;width:10px;height:10px;background:var(--acid);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s;mix-blend-mode:difference;}
+#cursor-ring{position:fixed;top:0;left:0;z-index:9997;width:32px;height:32px;border:1px solid rgba(200,255,0,0.35);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width 0.3s,height 0.3s,border-color 0.2s;}
+
+/* SCANLINE */
+#scanline{position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,255,0,0.12),transparent);z-index:9996;pointer-events:none;animation:scan 7s linear infinite;}
+@keyframes scan{from{top:-1px}to{top:100vh}}
+
+#ambient{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 2rem;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(8,8,8,0.82);}
+.nav-logo{display:flex;align-items:center;gap:0.6rem}
+.nav-icon svg{width:24px;height:24px}
+.nav-wordmark{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.2em}
+.nav-right{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim)}
+.nav-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--acid);margin-right:0.4rem;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;
+  padding:2rem;padding-top:80px;padding-bottom:3rem;
+  position:relative;overflow:hidden;
+}
+
+.hero-eyeline{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--acid);margin-bottom:1.5rem;opacity:0;animation:up 0.7s ease forwards 0.1s;position:relative;z-index:1;}
+
+/* Big VEIL wordmark */
+.hero-brand{position:relative;z-index:1;opacity:0;animation:up 1s cubic-bezier(0.16,1,0.3,1) forwards 0.2s;margin-bottom:1rem;width:100%;}
+.hero-brand-word{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(7rem,28vw,22rem);
+  letter-spacing:-0.01em;line-height:0.85;
+  display:flex;align-items:baseline;justify-content:center;
+  width:100%;
+}
+.hero-brand-word .ac{color:var(--acid);}
+.hero-brand-word .wh{color:var(--white);}
+.hero-brand::after{content:'';position:absolute;bottom:-10px;left:10%;right:10%;height:50px;background:radial-gradient(ellipse 80% 100% at 50% 50%,rgba(200,255,0,0.07) 0%,transparent 70%);pointer-events:none;}
+
+.hero-tagline-main{font-size:clamp(0.9rem,2.2vw,1.15rem);font-style:italic;color:var(--dim);line-height:1.65;max-width:420px;opacity:0;animation:up 0.7s ease forwards 0.45s;position:relative;z-index:1;margin-bottom:2.5rem;}
+
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;opacity:0;animation:up 0.7s ease forwards 0.6s;position:relative;z-index:1;}
+
+.hero-cta{display:inline-block;padding:0.75rem 1.8rem;border:1px solid var(--acid);color:var(--acid);font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.15em;text-decoration:none;cursor:none;background:transparent;transition:background 0.2s,color 0.2s,box-shadow 0.2s;white-space:nowrap;}
+.hero-cta:hover{background:var(--acid);color:var(--black);box-shadow:0 0 24px rgba(200,255,0,0.2)}
+
+.hero-scroll-btn{display:inline-flex;align-items:center;gap:0.6rem;background:transparent;border:1px solid var(--border);color:var(--dim);padding:0.72rem 1.3rem;font-family:'Bebas Neue',sans-serif;font-size:0.78rem;letter-spacing:0.13em;cursor:none;transition:border-color 0.2s,color 0.2s;text-decoration:none;white-space:nowrap;}
+.hero-scroll-btn:hover{border-color:var(--border-hover);color:var(--white)}
+.scroll-arrow{width:11px;height:11px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin-top:-3px;flex-shrink:0;animation:arrowBob 1.6s ease infinite;}
+@keyframes arrowBob{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(3px)}}
+
+.hero-counter{margin-top:2.5rem;opacity:0;animation:up 0.7s ease forwards 0.75s;position:relative;z-index:1;text-align:center;}
+.stolen-label{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);margin-bottom:0.3rem}
+.stolen-count{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--acid);line-height:1;}
+.stolen-sub{font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;margin-top:0.2rem}
+
+/* MARQUEE */
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:0.8rem 0;position:relative;z-index:1;}
+.marquee-track{display:flex;gap:2.5rem;animation:marquee 18s linear infinite;width:max-content}
+.marquee-item{font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);white-space:nowrap;display:flex;align-items:center;gap:0.8rem;}
+.marquee-item::after{content:'◆';color:var(--acid);font-size:0.35rem}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+.section{padding:5rem 2rem;border-bottom:1px solid var(--border);position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;}
+.section-tag{font-size:0.6rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--acid);margin-bottom:2.5rem;display:flex;align-items:center;gap:0.8rem;align-self:flex-start;}
+.section-tag::after{content:'';flex:1;height:1px;background:var(--border);max-width:40px}
+
+/* STATEMENT */
+.statement{text-align:center;display:flex;flex-direction:column;align-items:center;}
+.statement h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,6vw,5.5rem);line-height:0.92;margin-bottom:1.5rem;}
+.statement p{color:var(--dim);font-size:0.9rem;line-height:1.8;max-width:480px}
+.acid{color:var(--acid)}
+
+/* SIMULATOR */
+.simulator-wrap{margin-top:0;padding:5rem 2rem;border-bottom:1px solid var(--border);position:relative;z-index:1;}
+.sim-inner{max-width:700px;margin:0 auto;text-align:center}
+.sim-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,5vw,3.5rem);margin-bottom:0.5rem;}
+.sim-sub{color:var(--dim);font-size:0.82rem;margin-bottom:3rem;line-height:1.6}
+.phone-stage{position:relative;margin:0 auto;width:200px;height:360px;}
+.phone-frame{width:100%;height:100%;border:2px solid rgba(240,237,232,0.15);border-radius:28px;background:#0d0d0d;position:relative;overflow:hidden;transition:border-color 0.5s ease;}
+.phone-screen{position:absolute;inset:8px;border-radius:22px;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;transition:background 0.6s ease;}
+.phone-time{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--white);letter-spacing:0.05em}
+.phone-status{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim)}
+.phone-notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:60px;height:8px;background:#0d0d0d;border-radius:4px;z-index:2;}
+.phone-btn{position:absolute;right:-3px;top:80px;width:3px;height:30px;background:rgba(240,237,232,0.1);border-radius:2px;}
+.sim-state{display:none;flex-direction:column;align-items:center;gap:0.4rem;width:100%}
+.sim-state.active{display:flex}
+.sim-icon{font-size:1.8rem;margin-bottom:0.3rem}
+.sim-text{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--dim)}
+.sim-text.green{color:var(--acid)}
+.sim-coords{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--acid);letter-spacing:0.1em;opacity:0;animation:fadeIn 0.5s ease forwards;}
+.sim-ping{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 0 rgba(200,255,0,0.4);animation:pingPulse 1.2s ease infinite;}
+@keyframes pingPulse{0%{box-shadow:0 0 0 0 rgba(200,255,0,0.5)}70%{box-shadow:0 0 0 16px rgba(200,255,0,0)}100%{box-shadow:0 0 0 0 rgba(200,255,0,0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sim-progress{width:80%;height:2px;background:rgba(240,237,232,0.06);border-radius:1px;margin-top:0.5rem;}
+.sim-progress-bar{height:100%;background:var(--acid);border-radius:1px;width:0%;transition:width 0.1s linear;}
+.sim-btn{margin-top:2.5rem;padding:0.8rem 2.5rem;background:transparent;border:1px solid var(--border);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.15em;cursor:none;transition:border-color 0.2s,color 0.2s,background 0.2s;}
+.sim-btn:hover{border-color:var(--acid);color:var(--acid)}
+.sim-btn.running{border-color:var(--acid);color:var(--acid);opacity:0.5;pointer-events:none}
+.sim-log{margin-top:2rem;width:100%;max-width:380px;margin-left:auto;margin-right:auto;text-align:left;}
+.sim-log-item{font-size:0.7rem;color:var(--dim);letter-spacing:0.05em;padding:0.4rem 0;border-bottom:1px solid var(--border);display:none;align-items:center;gap:0.6rem;}
+.sim-log-item.show{display:flex}
+.log-dot{width:4px;height:4px;border-radius:50%;background:var(--acid);flex-shrink:0}
+.log-dot.red{background:#ff4444}
+.log-time{color:var(--acid);font-family:'Bebas Neue',sans-serif;letter-spacing:0.1em}
+
+/* ── FLOATING WAITLIST BUTTON ── */
+#floatingWaitlist{
+  position:fixed;
+  bottom:2rem;right:2rem;
+  z-index:200;
+  opacity:0;pointer-events:none;
+  transform:translateY(16px) scale(0.95);
+  transition:opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+#floatingWaitlist.visible{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+#floatingWaitlist a{
+  display:flex;align-items:center;gap:0.7rem;
+  background:var(--acid);color:var(--black);
+  padding:0.8rem 1.5rem;font-family:'Bebas Neue',sans-serif;font-size:0.82rem;letter-spacing:0.15em;
+  text-decoration:none;cursor:none;
+  box-shadow:0 4px 32px rgba(200,255,0,0.3),0 2px 8px rgba(0,0,0,0.4);
+  transition:box-shadow 0.2s,transform 0.15s;white-space:nowrap;border-radius:2px;
+}
+#floatingWaitlist a:hover{box-shadow:0 6px 40px rgba(200,255,0,0.5);transform:translateY(-2px);}
+.float-icon{width:13px;height:13px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin-top:1px;flex-shrink:0;}
+
+/* VARIANTS */
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);}
+.variant{background:var(--black);padding:2.5rem;position:relative;overflow:hidden;transition:background 0.4s ease;cursor:none;}
+.variant::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(200,255,0,0) 0%,transparent 70%);transition:opacity 0.5s;opacity:0;}
+.variant.pro-active::before{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(200,255,0,0.06) 0%,transparent 70%);opacity:1;}
+.variant:hover{background:#0d0d0b}
+.variant-tag{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);margin-bottom:1.2rem}
+.variant.pro .variant-tag{color:var(--acid)}
+.variant-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:0.05em;margin-bottom:0.4rem}
+.variant-desc{color:var(--dim);font-size:0.82rem;line-height:1.7;margin-bottom:1.8rem;max-width:300px}
+.variant-features{list-style:none;display:flex;flex-direction:column;gap:0.6rem}
+.variant-features li{font-size:0.78rem;color:var(--dim);display:flex;align-items:flex-start;gap:0.6rem;line-height:1.5;transition:color 0.2s;}
+.variant-features li::before{content:'—';color:var(--acid);flex-shrink:0}
+.variant:hover .variant-features li{color:rgba(240,237,232,0.7)}
+.pro-badge{position:absolute;top:1.2rem;right:1.2rem;font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;background:var(--acid);color:var(--black);padding:0.25rem 0.7rem;font-weight:500;}
+
+/* FORM */
+.form-wrap{max-width:660px;margin:0 auto;padding:5rem 2rem;position:relative;z-index:1}
+.form-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,7vw,5.5rem);line-height:0.9;margin-bottom:0.8rem}
+.form-sub{color:var(--dim);font-size:0.82rem;line-height:1.7;margin-bottom:3.5rem}
+.q-block{margin-bottom:2.5rem}
+.q-num{font-size:0.58rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--acid);margin-bottom:0.7rem}
+.q-text{font-size:0.95rem;font-weight:400;margin-bottom:1rem;line-height:1.5}
+.opts{display:flex;flex-wrap:wrap;gap:0.45rem}
+.opt-input{display:none}
+.opt-input+label{padding:0.5rem 1rem;border:1px solid var(--border);font-size:0.72rem;letter-spacing:0.05em;cursor:none;color:var(--dim);transition:all 0.15s ease,transform 0.1s;}
+.opt-input+label:hover{border-color:var(--border-hover);color:var(--white);transform:translateY(-1px)}
+.opt-input:checked+label{border-color:var(--acid);color:var(--acid);background:rgba(200,255,0,0.04)}
+.q-line{border:none;border-top:1px solid var(--border);margin:1.8rem 0}
+.text-in{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:300;padding:0.7rem 0;outline:none;transition:border-color 0.3s;cursor:none;}
+.text-in::placeholder{color:var(--dim)}
+.text-in:focus{border-color:var(--acid)}
+.email-row{display:grid;grid-template-columns:1fr auto;gap:0.8rem;align-items:end;margin-top:0.8rem}
+.submit{background:var(--acid);color:var(--black);border:none;padding:0.75rem 1.6rem;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.1em;cursor:none;white-space:nowrap;transition:opacity 0.2s,transform 0.15s,box-shadow 0.2s;}
+.submit:hover{box-shadow:0 0 22px rgba(200,255,0,0.25);transform:translateY(-1px)}
+.submit:active{transform:scale(0.97)}
+.submit:disabled{opacity:0.35;pointer-events:none}
+.success{display:none;text-align:center;padding:4rem 0}
+.success-big{font-family:'Bebas Neue',sans-serif;font-size:4.5rem;color:var(--acid);margin-bottom:0.8rem}
+.success p{color:var(--dim);font-size:0.82rem;line-height:1.7}
+
+footer{padding:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;flex-wrap:wrap;gap:1rem;}
+.footer-logo{display:flex;align-items:center;gap:0.5rem}
+.footer-logo svg{width:18px;height:18px}
+.footer-name{font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:0.2em}
+.footer-right{font-size:0.62rem;color:var(--dim);letter-spacing:0.08em}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),transform 0.8s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  body{cursor:auto}
+  #cursor,#cursor-ring{display:none}
+  nav{padding:1rem 1.2rem}
+  .nav-right{display:none}
+
+  /* Hero: no dead space — content starts right below nav */
+  .hero{
+    min-height:unset;height:auto;
+    justify-content:flex-start;
+    align-items:center;
+    padding:1.2rem;
+    padding-top:72px;
+    padding-bottom:2.5rem;
+  }
+  .hero-eyeline{margin-bottom:1rem;margin-top:0.5rem}
+  .hero-brand-word{font-size:clamp(5rem,28vw,7rem)}
+  .hero-tagline-main{font-size:0.88rem;margin-bottom:1.8rem;text-align:center;}
+  .hero-actions{flex-direction:column;align-items:center;gap:0.7rem;width:100%;}
+  .hero-scroll-btn,.hero-cta{width:100%;justify-content:center;text-align:center}
+  .hero-counter{margin-top:1.8rem;text-align:center;}
+
+  .section{padding:3.5rem 1.2rem}
+  .simulator-wrap{padding:3.5rem 1.2rem}
+  .variants{grid-template-columns:1fr}
+  .variant{padding:2rem 1.5rem}
+  .form-wrap{padding:3.5rem 1.2rem}
+  .email-row{grid-template-columns:1fr}
+  .submit{width:100%;text-align:center}
+  footer{padding:1.5rem 1.2rem}
+  .opt-input+label{font-size:0.8rem;padding:0.6rem 1rem}
+  .opts{gap:0.5rem}
+  #floatingWaitlist{bottom:1.2rem;right:1.2rem}
+  #floatingWaitlist a{padding:0.65rem 1.1rem;font-size:0.76rem}
+}
+@media(max-width:400px){
+  .hero-brand-word{font-size:3.8rem}
+  .phone-stage{width:160px;height:290px}
+  .phone-time{font-size:2.2rem}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="scanline"></div>
+<div id="ambient"></div>
+
+<!-- FLOATING WAITLIST BUTTON (appears when simulator scrolls into view) -->
+<div id="floatingWaitlist">
+  <a href="#waitlist">
+    JOIN WAITLIST
+    <span class="float-icon"></span>
+  </a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="10,15 45,15 50,28 38,28 50,85 62,28 55,28 60,15 90,15 65,85 55,85 50,72 45,85 35,85" fill="#C8FF00"/>
+        <polygon points="38,28 50,28 45,42 37,42" fill="#080808"/>
+      </svg>
+    </div>
+    <div class="nav-wordmark">VEIL</div>
+  </div>
+  <div class="nav-right"><span class="nav-dot"></span>Early Access Open</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyeline">Smart Case Technology — Coming 2027</div>
+
+  <div class="hero-brand">
+    <div class="hero-brand-word">
+      <span class="ac">V</span><span class="wh">EI</span><span class="ac">L</span>
+    </div>
+  </div>
+
+  <p class="hero-tagline-main">The case that never stops watching —<br>even when your phone does.</p>
+
+  <div class="hero-actions">
+    <a class="hero-cta" href="#waitlist">JOIN WAITLIST</a>
+    <a class="hero-scroll-btn" href="#simulator">
+      SEE IT IN ACTION <span class="scroll-arrow"></span>
+    </a>
+  </div>
+
+  <div class="hero-counter">
+    <div class="stolen-label">Phones stolen in 2026</div>
+    <div class="stolen-count" id="stolenCount">0</div>
+    <div class="stolen-sub">And counting — every 2 seconds</div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Independent Tracking</div>
+    <div class="marquee-item">Always On</div>
+    <div class="marquee-item">Anti-Theft</div>
+    <div class="marquee-item">Smart Case</div>
+    <div class="marquee-item">Instant Alerts</div>
+    <div class="marquee-item">Two Variants</div>
+    <div class="marquee-item">Global Coverage</div>
+    <div class="marquee-item">VEIL</div>
+    <div class="marquee-item">Independent Tracking</div>
+    <div class="marquee-item">Always On</div>
+    <div class="marquee-item">Anti-Theft</div>
+    <div class="marquee-item">Smart Case</div>
+    <div class="marquee-item">Instant Alerts</div>
+    <div class="marquee-item">Two Variants</div>
+    <div class="marquee-item">Global Coverage</div>
+    <div class="marquee-item">VEIL</div>
+  </div>
+</div>
+
+<!-- STATEMENT -->
+<section class="section">
+  <div class="section-tag">The Problem</div>
+  <div class="statement reveal">
+    <h2>YOUR PHONE<br>GETS STOLEN.<br><span class="acid">IT GOES OFF.</span><br>YOU LOSE IT.</h2>
+    <p>Every tracking solution on the market shares the same fatal flaw — the moment your phone powers off, they go blind. Software can't run on a dead device. VEIL can.</p>
+  </div>
+</section>
+
+<!-- THEFT SIMULATOR -->
+<div id="simulator" class="simulator-wrap reveal">
+  <div class="section-tag">Experience It</div>
+  <div class="sim-inner">
+    <h2 class="sim-heading">Your phone just got stolen.</h2>
+    <p class="sim-sub">See what happens next — with and without VEIL.</p>
+
+    <div class="phone-stage">
+      <div class="phone-frame" id="phoneFrame">
+        <div class="phone-notch"></div>
+        <div class="phone-btn"></div>
+        <div class="phone-screen" id="phoneScreen">
+          <div class="sim-state active" id="state0">
+            <div class="phone-time" id="simTime">9:41</div>
+            <div class="phone-status">iPhone 16 Pro</div>
+          </div>
+          <div class="sim-state" id="state1">
+            <div class="sim-icon">📵</div>
+            <div class="sim-text">Device powered off</div>
+            <div class="sim-text">Signal lost</div>
+          </div>
+          <div class="sim-state" id="state2">
+            <div class="sim-text">Without VEIL</div>
+            <div class="sim-text" style="color:#ff4444;font-size:0.75rem;letter-spacing:0.05em;margin-top:0.3rem">Location unavailable</div>
+            <div class="sim-text" style="margin-top:0.3rem">Gone.</div>
+          </div>
+          <div class="sim-state" id="state3">
+            <div class="sim-ping"></div>
+            <div class="sim-text green">VEIL Active</div>
+            <div class="sim-coords" id="simCoords">28.6139° N, 77.2090° E</div>
+            <div class="sim-text green" style="font-size:0.6rem">Transmitting location</div>
+            <div class="sim-progress" style="width:80%;margin-top:0.3rem">
+              <div class="sim-progress-bar" id="simBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-log" id="simLog">
+      <div class="sim-log-item" id="log1"><span class="log-dot red"></span><span class="log-time">09:41</span> Phone powered off by thief</div>
+      <div class="sim-log-item" id="log2"><span class="log-dot red"></span><span class="log-time">09:41</span> Find My Device — signal lost</div>
+      <div class="sim-log-item" id="log3"><span class="log-dot"></span><span class="log-time">09:41</span> VEIL — independent system active</div>
+      <div class="sim-log-item" id="log4"><span class="log-dot"></span><span class="log-time">09:41</span> Location ping sent to your app</div>
+      <div class="sim-log-item" id="log5"><span class="log-dot"></span><span class="log-time">09:41</span> Alert fired — coordinates locked</div>
+    </div>
+
+    <button class="sim-btn" id="simBtn" onclick="runSim()">TAP TO SIMULATE THEFT</button>
+  </div>
+</div>
+
+<!-- VARIANTS -->
+<section class="section">
+  <div class="section-tag">Two Variants</div>
+  <div class="variants reveal">
+    <div class="variant" id="variantStd">
+      <div class="variant-tag">Standard</div>
+      <div class="variant-name">VEIL</div>
+      <div class="variant-desc">For everyone. Slim enough to forget it's there. Smart enough to find your phone when it isn't.</div>
+      <ul class="variant-features">
+        <li>Crowd-based location tracking</li>
+        <li>Instant tamper alerts</li>
+        <li>Weeks of battery life</li>
+        <li>Indistinguishable from a normal case</li>
+        <li>Switchable outer shells</li>
+        <li>No subscription required</li>
+      </ul>
+    </div>
+    <div class="variant pro" id="variantPro">
+      <div class="pro-badge">Recommended</div>
+      <div class="variant-tag">Pro</div>
+      <div class="variant-name">VEIL PRO</div>
+      <div class="variant-desc">Independent. Unconditional. Finds your phone anywhere in the world — no crowd needed, no exceptions.</div>
+      <ul class="variant-features">
+        <li>Fully independent location — no crowd required</li>
+        <li>Works anywhere, any conditions, any power state</li>
+        <li>Instant tamper alerts with live location</li>
+        <li>Smart charging — powers your phone too</li>
+        <li>Switchable outer shells</li>
+        <li>Regional or global coverage plans available</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section id="waitlist" style="border-bottom:1px solid var(--border)">
+<div class="form-wrap">
+  <div class="section-tag">Waitlist</div>
+  <h2 class="form-heading reveal">SHAPE<br>WHAT<br>WE BUILD.</h2>
+  <p class="form-sub reveal">We're building VEIL for people who refuse to lose. Answer 5 questions, get early access pricing — and help us get this right.</p>
+
+  <form id="veilForm">
+    <div class="q-block reveal">
+      <div class="q-num">01 — Experience</div>
+      <div class="q-text">Have you ever lost your phone or had it stolen?</div>
+      <div class="opts">
+        <input type="radio" name="q1" id="q1a" value="Yes — lost it" class="opt-input"><label for="q1a">Yes — lost it</label>
+        <input type="radio" name="q1" id="q1b" value="Yes — stolen" class="opt-input"><label for="q1b">Yes — stolen</label>
+        <input type="radio" name="q1" id="q1c" value="No but I worry" class="opt-input"><label for="q1c">No but I worry</label>
+        <input type="radio" name="q1" id="q1d" value="Never thought about it" class="opt-input"><label for="q1d">Never thought about it</label>
+      </div>
+    </div>
+    <hr class="q-line">
+    <div class="q-block reveal">
+      <div class="q-num">02 — Habits</div>
+      <div class="q-text">Do you use a case on your phone right now?</div>
+      <div class="opts">
+        <input type="radio" name="q2" id="q2a" value="Always" class="opt-input"><label for="q2a">Always</label>
+        <input type="radio" name="q2" id="q2b" value="Sometimes" class="opt-input"><label for="q2b">Sometimes</label>
+        <input type="radio" name="q2" id="q2c" value="Never" class="opt-input"><label for="q2c">Never — I like the bare look</label>
+      </div>
+    </div>
+    <hr class="q-line">
+    <div class="q-block reveal">
+      <div class="q-num">03 — Your Device</div>
+      <div class="q-text">What phone do you use?</div>
+      <div class="opts">
+        <input type="radio" name="q3" id="q3a" value="iPhone Pro/Pro Max" class="opt-input"><label for="q3a">iPhone Pro / Pro Max</label>
+        <input type="radio" name="q3" id="q3b" value="iPhone Standard" class="opt-input"><label for="q3b">iPhone Standard</label>
+        <input type="radio" name="q3" id="q3c" value="Samsung Ultra" class="opt-input"><label for="q3c">Samsung Ultra</label>
+        <input type="radio" name="q3" id="q3d" value="Samsung Standard" class="opt-input"><label for="q3d">Samsung Standard</label>
+        <input type="radio" name="q3" id="q3e" value="Other Android" class="opt-input"><label for="q3e">Other Android</label>
+      </div>
+    </div>
+    <hr class="q-line">
+    <div class="q-block reveal">
+      <div class="q-num">04 — Intent</div>
+      <div class="q-text">If a case could track your phone even when completely powered off — would you buy it?</div>
+      <div class="opts">
+        <input type="radio" name="q4" id="q4a" value="Absolutely" class="opt-input"><label for="q4a">Absolutely</label>
+        <input type="radio" name="q4" id="q4b" value="Probably yes" class="opt-input"><label for="q4b">Probably yes</label>
+        <input type="radio" name="q4" id="q4c" value="Maybe" class="opt-input"><label for="q4c">Maybe</label>
+        <input type="radio" name="q4" id="q4d" value="Probably not" class="opt-input"><label for="q4d">Probably not</label>
+      </div>
+    </div>
+    <hr class="q-line">
+    <div class="q-block reveal">
+      <div class="q-num">05 — Pricing</div>
+      <div class="q-text">You have a flagship phone worth $800–1,200. How much would you pay for a case that guarantees you can always find it — no matter what?</div>
+      <div class="opts">
+        <input type="radio" name="q5" id="q5a" value="Under $40" class="opt-input"><label for="q5a">Under $40</label>
+        <input type="radio" name="q5" id="q5b" value="$40-70" class="opt-input"><label for="q5b">$40–$70</label>
+        <input type="radio" name="q5" id="q5c" value="$70-100" class="opt-input"><label for="q5c">$70–$100</label>
+        <input type="radio" name="q5" id="q5d" value="$100-150" class="opt-input"><label for="q5d">$100–$150</label>
+        <input type="radio" name="q5" id="q5e" value="$150+" class="opt-input"><label for="q5e">$150+</label>
+      </div>
+    </div>
+    <hr class="q-line">
+    <div class="q-block reveal">
+      <div class="q-num">Early Access</div>
+      <div class="q-text">Leave your email. Be first in line when VEIL launches.</div>
+      <div class="email-row">
+        <input type="email" name="email" class="text-in" placeholder="your@email.com" required>
+        <button type="submit" class="submit" id="submitBtn">JOIN VEIL</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="success" id="successMsg">
+    <div class="success-big">YOU'RE IN.</div>
+    <p>We'll reach out when VEIL is ready for early access.<br>Thanks for helping us build this right.</p>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="10,15 45,15 50,28 38,28 50,85 62,28 55,28 60,15 90,15 65,85 55,85 50,72 45,85 35,85" fill="#C8FF00"/>
+      <polygon points="38,28 50,28 45,42 37,42" fill="#080808"/>
+    </svg>
+    <div class="footer-name">VEIL</div>
+  </div>
+  <div class="footer-right">Off doesn't mean gone. — Est. 2026</div>
+</footer>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl9kvzaKGAjmRrSxwTHtpMxRGk18F1-qRLBPvvLVbo3VNVHObBf5liyTHB9Epmp2fp/exec'; // ← paste your /exec URL here
+
+// CURSOR
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let cx=0,cy=0,rx=0,ry=0;
+const isMobile=window.innerWidth<=768;
+if(!isMobile){
+  document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;cursor.style.left=cx+'px';cursor.style.top=cy+'px';});
+  (function animRing(){rx+=(cx-rx)*0.12;ry+=(cy-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+  document.querySelectorAll('a,button,label').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.width='5px';cursor.style.height='5px';ring.style.width='46px';ring.style.height='46px';ring.style.borderColor='rgba(200,255,0,0.6)';});
+    el.addEventListener('mouseleave',()=>{cursor.style.width='10px';cursor.style.height='10px';ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(200,255,0,0.35)';});
+  });
+}
+
+// AMBIENT
+const ambient=document.getElementById('ambient');
+if(!isMobile){
+  document.addEventListener('mousemove',e=>{
+    const mx=(e.clientX/window.innerWidth*100).toFixed(1),my=(e.clientY/window.innerHeight*100).toFixed(1);
+    ambient.style.background=`radial-gradient(ellipse 60% 50% at ${mx}% ${my}%,rgba(200,255,0,0.045) 0%,transparent 65%),radial-gradient(ellipse 35% 40% at ${100-mx}% ${100-my}%,rgba(200,255,0,0.02) 0%,transparent 55%)`;
+  });
+} else {
+  ambient.style.background='radial-gradient(ellipse 70% 40% at 50% 20%,rgba(200,255,0,0.03) 0%,transparent 65%)';
+}
+
+// STOLEN COUNTER
+const now=new Date(),start2026=new Date('2026-01-01T00:00:00Z');
+const stolenBase=Math.max(0,Math.floor((now-start2026)/1000)*32);
+const countEl=document.getElementById('stolenCount');
+(function animateCount(target,current){
+  if(Math.abs(target-current)<10){countEl.textContent=target.toLocaleString();return;}
+  current+=(target-current)*0.06;countEl.textContent=Math.round(current).toLocaleString();
+  requestAnimationFrame(()=>animateCount(target,current));
+})(stolenBase,0);
+setInterval(()=>{const sc=parseInt(countEl.textContent.replace(/,/g,''))||stolenBase;countEl.textContent=(sc+Math.floor(Math.random()*4+1)).toLocaleString();},2100);
+
+// CLOCK
+function updateClock(){const t=new Date();document.getElementById('simTime').textContent=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');}
+updateClock();setInterval(updateClock,30000);
+
+// THEFT SIMULATOR
+let simRunning=false;
+const coords=['28.6139° N, 77.2090° E','51.5074° N, 0.1278° W','40.7128° N, 74.0060° W','35.6762° N, 139.6503° E','19.0760° N, 72.8777° E','48.8566° N, 2.3522° E'];
+function showState(id){document.querySelectorAll('.sim-state').forEach(s=>s.classList.remove('active'));document.getElementById('state'+id).classList.add('active');}
+function showLog(id,delay){setTimeout(()=>document.getElementById('log'+id).classList.add('show'),delay);}
+async function runSim(){
+  if(simRunning)return;simRunning=true;
+  const btn=document.getElementById('simBtn');btn.classList.add('running');btn.textContent='RUNNING...';
+  document.querySelectorAll('.sim-log-item').forEach(l=>l.classList.remove('show'));
+  document.getElementById('simBar').style.width='0%';
+
+  // Use real current time for all log entries
+  const t=new Date();
+  const timeStr=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+  document.querySelectorAll('.log-time').forEach(el=>el.textContent=timeStr);
+
+  const frame=document.getElementById('phoneFrame'),screen=document.getElementById('phoneScreen');
+  showState(0);frame.style.borderColor='rgba(240,237,232,0.15)';screen.style.background='#111';
+  await sleep(800);
+  showState(1);screen.style.background='#080808';frame.style.borderColor='rgba(255,68,68,0.3)';showLog(1,0);showLog(2,600);
+  await sleep(2000);showState(2);await sleep(1800);
+  document.getElementById('simCoords').textContent=coords[Math.floor(Math.random()*coords.length)];
+  showState(3);screen.style.background='#080f08';frame.style.borderColor='rgba(200,255,0,0.4)';
+  showLog(3,0);showLog(4,700);showLog(5,1400);
+  let prog=0;const bi=setInterval(()=>{prog=Math.min(100,prog+2);document.getElementById('simBar').style.width=prog+'%';if(prog>=100)clearInterval(bi);},60);
+  await sleep(3500);
+  showState(0);screen.style.background='#111';frame.style.borderColor='rgba(240,237,232,0.15)';
+  btn.classList.remove('running');btn.textContent='RUN AGAIN';simRunning=false;
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// PRO HOVER
+const proCard=document.getElementById('variantPro');
+if(proCard){
+  proCard.addEventListener('mouseenter',()=>{proCard.classList.add('pro-active');document.body.style.setProperty('--black','#080b08');});
+  proCard.addEventListener('mouseleave',()=>{proCard.classList.remove('pro-active');document.body.style.setProperty('--black','#080808');});
+}
+
+// SCROLL REVEAL
+const revealObs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);revealObs.unobserve(e.target);}});},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+// FLOATING WAITLIST BUTTON — appears when simulator is visible, hides at waitlist
+const floatingBtn=document.getElementById('floatingWaitlist');
+const simSec=document.getElementById('simulator');
+const waitSec=document.getElementById('waitlist');
+const floatObs=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.target===simSec && entry.isIntersecting) floatingBtn.classList.add('visible');
+    if(entry.target===waitSec && entry.isIntersecting) floatingBtn.classList.remove('visible');
+  });
+},{threshold:0.15});
+floatObs.observe(simSec);
+floatObs.observe(waitSec);
+
+// MAGNETIC
+if(!isMobile){
+  document.querySelectorAll('.hero-cta,.hero-scroll-btn,.submit,.opt-input+label,.sim-btn').forEach(el=>{
+    el.addEventListener('mousemove',function(e){const r=this.getBoundingClientRect();const x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;this.style.transform=`translate(${x*0.1}px,${y*0.1}px)`;});
+    el.addEventListener('mouseleave',function(){this.style.transform='';});
+  });
+}
+
+// FORM SUBMIT
+document.getElementById('veilForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='SENDING...';
+  btn.style.background='rgba(200,255,0,0.15)';btn.style.color='var(--acid)';btn.style.border='1px solid var(--acid)';
+  const data={timestamp:new Date().toISOString(),email:document.querySelector('input[name="email"]').value,q1_lost_phone:document.querySelector('input[name="q1"]:checked')?.value||'',q2_uses_case:document.querySelector('input[name="q2"]:checked')?.value||'',q3_device:document.querySelector('input[name="q3"]:checked')?.value||'',q4_would_buy:document.querySelector('input[name="q4"]:checked')?.value||'',q5_price_range:document.querySelector('input[name="q5"]:checked')?.value||''};
+  try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(err){}
+  await sleep(700);
+  const form=document.getElementById('veilForm');form.style.opacity='0';form.style.transition='opacity 0.4s ease';
+  await sleep(400);form.style.display='none';
+  const s=document.getElementById('successMsg');s.style.display='block';s.style.opacity='0';s.style.transition='opacity 0.5s ease';
+  requestAnimationFrame(()=>{s.style.opacity='1';});
+  s.scrollIntoView({behavior:'smooth'});
+  floatingBtn.classList.remove('visible');
+});
+</script>
+</body>
+</html>
